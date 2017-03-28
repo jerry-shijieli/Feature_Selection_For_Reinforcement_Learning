@@ -1,0 +1,2 @@
+# CSC591_AssignedProject_Feature_Selection_For_Reinforcement_Learning
+Feature selection for reinforcement learning in educational policy development
