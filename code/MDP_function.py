@@ -58,16 +58,16 @@ def generate_MDP_input2(original_data, features):
             expectR[act] = np.divide(expectR[act], A[act])
             expectR[np.isnan(expectR)] = 0
 
-        # each column will sum to 1 for each row, obtain the state transition table
-        A[act] = np.divide(A[act].transpose(), np.sum(A[act], axis=1))
-        A[act] = A[act].transpose()
-        # add code for NaN case in tranisition matrix A
-        nan_list = np.isnan(np.sum(A[act],axis=1))
-        if any(nan_list):
-            A[act][nan_list] = np.zeros(len(A[act][0]))
-            for i in range(len(nan_list)):
-                if (nan_list[i]):
-                    A[act][i][i] = 1.0
+            # each column will sum to 1 for each row, obtain the state transition table
+            A[act] = np.divide(A[act].transpose(), np.sum(A[act], axis=1))
+            A[act] = A[act].transpose()
+            # add code for NaN case in tranisition matrix A
+            nan_list = np.isnan(np.sum(A[act],axis=1))
+            if any(nan_list):
+                A[act][nan_list] = np.zeros(len(A[act][0]))
+                for i in range(len(nan_list)):
+                    if (nan_list[i]):
+                        A[act][i][i] = 1.0
 
     return [start_states, A, expectR, distinct_acts, distinct_states]
 
@@ -101,8 +101,12 @@ def induce_policy_MDP2(original_data, selected_features):
     print('ECR value: ' + str(ECR_value))
     return ECR_value
 
-def compute_ECR(original_data, selected_features):
+def compute_ECR(original_data, selected_features, printA=False, printR=False):
     [start_states, A, expectR, distinct_acts, distinct_states] = generate_MDP_input2(original_data, selected_features)
+    if printA:
+        print A
+    if printR:
+        print expectR
     # apply Value Iteration to run the MDP
     vi = mdptoolbox.mdp.ValueIteration(A, expectR, 0.9)
     vi.run()
