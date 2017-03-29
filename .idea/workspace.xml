@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4a4034cb-507e-4396-8187-184126f28fd5" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/code/.ipynb_checkpoints/correlation_based_faeture_selection-checkpoint.ipynb" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/code/correlation_based_faeture_selection.ipynb" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/code/.ipynb_checkpoints/correlation_based_feature_selection-checkpoint.ipynb" afterPath="$PROJECT_DIR$/code/.ipynb_checkpoints/correlation_based_feature_selection-checkpoint.ipynb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/code/correlation_based_feature_selection.ipynb" afterPath="$PROJECT_DIR$/code/correlation_based_feature_selection.ipynb" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -31,8 +32,8 @@
       <file leaf-file-name="MDP_function.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/code/MDP_function.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="27">
-              <caret line="69" column="38" lean-forward="true" selection-start-line="69" selection-start-column="38" selection-end-line="69" selection-end-column="38" />
+            <state relative-caret-position="1017">
+              <caret line="69" column="38" lean-forward="false" selection-start-line="69" selection-start-column="38" selection-end-line="69" selection-end-column="38" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -56,6 +57,7 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/code/mdp_feature_selection_001.py" />
+        <option value="$PROJECT_DIR$/code/MDP_function.py" />
       </list>
     </option>
   </component>
@@ -184,8 +186,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/code/MDP_function.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="27">
-          <caret line="69" column="38" lean-forward="true" selection-start-line="69" selection-start-column="38" selection-end-line="69" selection-end-column="38" />
+        <state relative-caret-position="1017">
+          <caret line="69" column="38" lean-forward="false" selection-start-line="69" selection-start-column="38" selection-end-line="69" selection-end-column="38" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
