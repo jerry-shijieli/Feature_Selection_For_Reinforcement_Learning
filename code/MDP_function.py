@@ -99,17 +99,20 @@ def induce_policy_MDP2(original_data, selected_features):
     print('ECR value: ' + str(ECR_value))
     return ECR_value
 
-def compute_ECR(original_data, selected_features, printA=False, printR=False):
+def compute_ECR(original_data, selected_features):
+
     [start_states, A, expectR, distinct_acts, distinct_states] = generate_MDP_input2(original_data, selected_features)
-    # if printA:
-    #     print A
-    # if printR:
-    #     print expectR
+
     # apply Value Iteration to run the MDP
     vi = mdptoolbox.mdp.ValueIteration(A, expectR, 0.9)
     vi.run()
+
+    # output policy
+    #output_policy(distinct_acts, distinct_states, vi)
+
     # evaluate policy using ECR
     ECR_value = calcuate_ECR(start_states, vi.V)
+    #print('ECR value: ' + str(ECR_value))
     return ECR_value
 
 
