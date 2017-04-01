@@ -10,7 +10,10 @@ def generate_MDP_input2(original_data, features):
     students_variables = ['student', 'priorTutorAction', 'reward']
 
     # generate distinct state based on feature
-    original_data['state'] = original_data[features].apply(lambda x: ':'.join(str(v) for v in x), axis=1)
+    if (type(original_data[features])==pandas.Series):
+    	original_data['state'] = original_data[features].apply(lambda x: ':'.join(str(v) for v in x)) # pd.Series
+    else:
+    	original_data['state'] = original_data[features].apply(lambda x: ':'.join(str(v) for v in x), axis=1) # pd.DataFrame
     students_variables = students_variables + ['state']
     data = original_data[students_variables]
 
@@ -100,7 +103,6 @@ def induce_policy_MDP2(original_data, selected_features):
     return ECR_value
 
 def compute_ECR(original_data, selected_features):
-
     [start_states, A, expectR, distinct_acts, distinct_states] = generate_MDP_input2(original_data, selected_features)
 
     # apply Value Iteration to run the MDP
