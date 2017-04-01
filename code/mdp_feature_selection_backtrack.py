@@ -90,7 +90,8 @@ while (len(optimal_feature_set) < MAX_NUM_OF_FEATURES):
     # check potential for improving ECR over all subsets of optimal feature set
     size_of_optimal_feature_set = len(optimal_feature_set)
     if (size_of_optimal_feature_set >= MAX_NUM_OF_FEATURES): 
-    	while (size_of_optimal_feature_set > 1):
+    	is_subset_better = True
+    	while (size_of_optimal_feature_set>1 and is_subset_better):
 	        ECR_list = map(lambda ft_index: mf.compute_ECR(all_data_discretized, 
 	                        optimal_feature_set[:ft_index]+optimal_feature_set[ft_index+1:]), 
 	                        range(size_of_optimal_feature_set-1)) # calculate ECR for optimal feature subsets
@@ -101,6 +102,8 @@ while (len(optimal_feature_set) < MAX_NUM_OF_FEATURES):
 	            optimal_feature_set = optimal_feature_set.pop(ft_index_of_max_subset_ECR)
 	            max_total_ECR = max_ECR_in_subset
 	            size_of_optimal_feature_set = len(optimal_feature_set)
+	        else:
+	        	is_subset_better = False
     # keep record of the highest ECR and its optimal feature set so far
     print "Highest ECR so far: "+str(max_total_ECR)+" with optimal feature set as:"
     print optimal_feature_set
