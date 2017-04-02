@@ -152,7 +152,7 @@ def feature_discretization_by_median(feature_data, maxLevel=2):
     feature_data = pd.Series(feature_data, dtype=int)
     return feature_data
 
-def feature_discretization_by_multilevels(feature_data， ):
+def feature_discretization_by_multilevels(feature_data， maxLevel=3):
     pass
 
 def compute_correlation(dataset, feature_set, feature):
@@ -162,6 +162,19 @@ def compute_correlation(dataset, feature_set, feature):
     #     corr_sum += corr
     # return corr_sum
     return rnd.random()
+
+def save_optimal_feature_selection(dataset, optimal_feature_set, max_total_ECR):
+    # with open('Training_data.csv', 'w') as fout:
+    data_to_save = dataset.loc[:, "student":"reward"]
+    for ft in optimal_feature_set:
+        data_to_save[ft] = dataset.loc[:, ft]
+    try:
+        data_to_save.to_csv('Training_data.csv', sep=',', index=False)
+        with open("bestECR.log",'a') as fout:
+            fout.write("Highest ECR so far: "+str(max_total_ECR)+" with optimal feature set as:")
+            fout.write(optimal_feature_set)
+    except:
+        print "Failed to save results!!!"
 
 
 
@@ -299,9 +312,16 @@ if __name__ == "__main__":
                     #is_subset_better = False
                 else:
                     is_subset_better = False
+                # better_ft_subset = list(np.where(np.array(ECR_list) >= max_total_ECR))
+                # for ft_index in better_ft_subset:
+                #     reduced_subset = list(ft_subset)
+                #     print "!!!Better optimal feature subset is discovered!!!" 
+                #     ft_removed = reduced_subset.pop(ft_index)
+                #     print "\tRemove feature "+str(ft_removed) 
             optimal_feature_set = list(ft_subset)
         # keep record of the highest ECR and its optimal feature set so far
         print "Highest ECR so far: "+str(max_total_ECR)+" with optimal feature set as:"
         print optimal_feature_set
 
+    save_optimal_feature_selection(all_data_discretized, optimal_feature_set, max_total_ECR)
     induce_policy_MDP2(all_data_discretized, optimal_feature_set)
