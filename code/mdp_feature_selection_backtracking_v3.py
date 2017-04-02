@@ -152,9 +152,9 @@ def feature_discretization_by_median(feature_data, maxLevel=2):
     feature_data = pd.Series(feature_data, dtype=int)
     return feature_data
 
-def feature_discretization_by_multilevels(feature_data， maxLevel=3):
-    pass
-
+def feature_discretization_by_multilevels(feature_data, maxLevel=3):
+    return 0
+    
 def compute_correlation(dataset, feature_set, feature):
     # corr_sum = 0
     # for ft in feature_set:
@@ -163,7 +163,7 @@ def compute_correlation(dataset, feature_set, feature):
     # return corr_sum
     return rnd.random()
 
-def save_optimal_feature_selection(dataset, optimal_feature_set, max_total_ECR):
+def save_optimal_feature_selection(dataset, optimal_feature_set, save_info):
     # with open('Training_data.csv', 'w') as fout:
     data_to_save = dataset.loc[:, "student":"reward"]
     for ft in optimal_feature_set:
@@ -171,8 +171,11 @@ def save_optimal_feature_selection(dataset, optimal_feature_set, max_total_ECR):
     try:
         data_to_save.to_csv('Training_data.csv', sep=',', index=False)
         with open("bestECR.log",'a') as fout:
-            fout.write("Highest ECR so far: "+str(max_total_ECR)+" with optimal feature set as:")
-            fout.write(optimal_feature_set)
+            for term in save_info.keys():
+                fout.write(term+save_info[term]+'\n')
+            # fout.write("Highest ECR so far: "+str(max_total_ECR)+" with optimal feature set as:")
+            # fout.write(', '.join(optimal_feature_set))
+            fout.write('\n')
     except:
         print "Failed to save results!!!"
 
@@ -232,6 +235,7 @@ if __name__ == "__main__":
     feature_space = map(lambda x: x[0], ECR_list_of_single_feature) # update feature space by ECR order
     optimal_feature_set.extend(map(lambda x: x[0], ECR_list_of_single_feature[:1])) # select top 7 ECR features
     # print ECR_list_of_single_feature
+    start_time = time.time() # record start time to measure searching time
     print "* Initial optimal feature selection is "
     print optimal_feature_set
     print "* Initial ECR is "
@@ -323,5 +327,11 @@ if __name__ == "__main__":
         print "Highest ECR so far: "+str(max_total_ECR)+" with optimal feature set as:"
         print optimal_feature_set
 
-    save_optimal_feature_selection(all_data_discretized, optimal_feature_set, max_total_ECR)
+    time_cost = time.time() - start_time # time cost on feature selection
+    save_info = dict() # feature selection info to save 
+    save_info["* Highest ECR so far: "] = str(max_total_ECR)
+    save_info["* Optimal feature set: "] = ', '.join(optimal_feature_set)
+    save_info["* Time cost in feature selection: "] = str(time_cost)
+    save_info["* Selection heuristic rule: "] = "Random walk with binary discretization"
+    save_optimal_feature_selection(all_data_discretized, optimal_feature_set, save_info)
     induce_policy_MDP2(all_data_discretized, optimal_feature_set)
