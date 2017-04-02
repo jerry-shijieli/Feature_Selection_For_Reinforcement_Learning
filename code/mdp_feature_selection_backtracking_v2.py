@@ -180,14 +180,14 @@ if __name__ == "__main__":
 
     # discretization feature values by median
     all_data_discretized = original_data.loc[:, "student":"reward"]
-    print "Feature discretization ... "
+    print ">>> Feature discretization ... "
     bar = pgb.ProgressBar()
     for ft in bar(feature_space):
         ft_data = original_data.loc[:, ft]
         all_data_discretized[ft] = feature_discretization_by_median(ft_data)
 
     # initialization to find the best feature with max ECR
-    print "Compute ECR for each individual feature (may take a while)..."
+    # print "Compute ECR for each individual feature (may take a while)..."
     # bar = pgb.ProgressBar()
     # for ft in bar(feature_space):
     #     selected_feature = [ft]
@@ -195,9 +195,12 @@ if __name__ == "__main__":
         #ECR_list_of_single_feature.append([ft, rnd.random()])
     feature_ECR_rank_file = "feature_ECR_rank.pkl"
     if os.path.exists(feature_ECR_rank_file):
+        print ">>> Load ECR for each individual feature (may take a while)..."
         with open(feature_ECR_rank_file, "rb") as fin:
             ECR_list_of_single_feature = pickle.load(fin)
+        print "\tSuccessful! Continue ..."
     else:
+        print ">>> Compute ECR for each individual feature (may take a while)..."
         bar = pgb.ProgressBar()
         for ft in bar(feature_space):
             ECR_list_of_single_feature.append([ft, compute_ECR(all_data_discretized, [ft])])
@@ -210,15 +213,19 @@ if __name__ == "__main__":
     ECR_list_of_single_feature = sorted(ECR_list_of_single_feature, key=lambda x: x[1], reverse=True) # sort feature by ECR
     ECR_dict_of_single_feature = dict(ECR_list_of_single_feature)
     feature_space = map(lambda x: x[0], ECR_list_of_single_feature) # update feature space by ECR order
-    optimal_feature_set.extend(map(lambda x: x[0], ECR_list_of_single_feature[:2])) # select top 7 ECR features
-    print(optimal_feature_set)
+    optimal_feature_set.extend(map(lambda x: x[0], ECR_list_of_single_feature[:1])) # select top 7 ECR features
+    # print ECR_list_of_single_feature
+    print "* Initial optimal feature selection is "
+    print optimal_feature_set
+    print "* Initial ECR is "
+    print str(compute_ECR(all_data_discretized, optimal_feature_set))
 
     # feature selection iterations
     rank_reverse = False
     # iter_count = 10
     while (len(optimal_feature_set) < MAX_NUM_OF_FEATURES):
         # iter_count -= 1
-        print "********* Search next feature on level <"+str(len(optimal_feature_set))+"> *********"
+        print "\n********* Search next feature on level <"+str(len(optimal_feature_set))+"> *********"
         #remain_feature_space = list(set(feature_space) - set(optimal_feature_set)) # features not in optimal feature set
         remain_feature_space = list([ft for ft in feature_space if ft not in optimal_feature_set])# features not in optimal feature set
         # feature selection heuristics
@@ -227,12 +234,14 @@ if __name__ == "__main__":
         # bar = pgb.ProgressBar()
         # for ft in bar(remain_feature_space):
         #     corr_list.append([ft, compute_correlation(all_data_discretized, optimal_feature_set, ft)])
-        topK = 5+int(0.03*np.exp(len(optimal_feature_set))) # dynamically choose top-K candidate features based on feature similarity metrics
+        # topK = 5+int(0.03*np.exp(len(optimal_feature_set))) # dynamically choose top-K candidate features based on feature similarity metrics
+        topK = 30+int(0.02*np.exp(len(optimal_feature_set))) # dynamically choose top-K candidate features based on feature similarity metrics
         #top_features = map(lambda x: x[0], sorted(corr_list, key=lambda x: x[1], reverse=correlation_rank_reverse)[:topK])
         # ECR_rank = map(lambda ft: [ft, ECR_dict_of_single_feature[ft]], remain_feature_space)
         # top_features = map(lambda x: x[0], sorted(ECR_rank, key=lambda x: x[1], reverse=rank_reverse)[:topK])
         top_features = list()
         count_features = 0
+        rnd.shuffle(remain_feature_space)
         top_features = remain_feature_space[:topK]
         # select optimal feature from candidate set based on ECR value
         ECR_list = list() # ECR values of optimal feature set with new candidate feature
