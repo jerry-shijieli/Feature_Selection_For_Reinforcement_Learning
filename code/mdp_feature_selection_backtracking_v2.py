@@ -1,4 +1,4 @@
-import collections
+import collections 
 import numpy as np
 import pandas as pd
 import mdptoolbox, mdptoolbox.example
@@ -6,16 +6,19 @@ import scipy.stats as stats
 import random as rnd
 import progressbar as pgb
 import time
+import os
+import sys
+import pickle
 
 def generate_MDP_input2(original_data, features):
 
     students_variables = ['student', 'priorTutorAction', 'reward']
 
     # generate distinct state based on feature
-    if (type(original_data[features])==pd.DataFrame):
+    try:
         original_data['state'] = original_data[features].apply(lambda x: ':'.join(str(v) for v in x), axis=1) # pd.DataFrame
-    else:
-        original_data['state'] = original_data[features].apply(lambda x: ':'.join(str(v) for v in x)) # pd.Series
+    except:
+        original_data['state'] = original_data[features].apply(lambda x: ':'.join(str(v) for v in x) if isinstance(x,collections.Iterable) else str(x)) # pd.Series
     # original_data['state'] = original_data[features].apply(tuple, axis=1)
     students_variables = students_variables + ['state']
     data = original_data[students_variables]
@@ -182,52 +185,69 @@ if __name__ == "__main__":
     for ft in bar(feature_space):
         ft_data = original_data.loc[:, ft]
         all_data_discretized[ft] = feature_discretization_by_median(ft_data)
-    #all_data_discretized = pd.DataFrame(all_data_discretized)
-    time.sleep(1)
 
     # initialization to find the best feature with max ECR
-    print "Compute ECR for each individual feature ..."
-    bar = pgb.ProgressBar()
-    for ft in bar(feature_space):
-        selected_feature = [ft]
-        #ECR_list_of_single_feature.append([ft, compute_ECR(all_data_discretized, selected_feature)])
-        ECR_list_of_single_feature.append(rnd.random())
-    time.sleep(1)
+    print "Compute ECR for each individual feature (may take a while)..."
+    # bar = pgb.ProgressBar()
+    # for ft in bar(feature_space):
+    #     selected_feature = [ft]
+    #     ECR_list_of_single_feature.append([ft, compute_ECR(all_data_discretized, selected_feature)])
+        #ECR_list_of_single_feature.append([ft, rnd.random()])
+    feature_ECR_rank_file = "feature_ECR_rank.pkl"
+    if os.path.exists(feature_ECR_rank_file):
+        with open(feature_ECR_rank_file, "rb") as fin:
+            ECR_list_of_single_feature = pickle.load(fin)
+    else:
+        bar = pgb.ProgressBar()
+        for ft in bar(feature_space):
+            ECR_list_of_single_feature.append([ft, compute_ECR(all_data_discretized, [ft])])
+        #ECR_list_of_single_feature = map(lambda ft: [ft, compute_ECR(all_data_discretized, [ft])], feature_space)
+        with open(feature_ECR_rank_file, "wb") as fout:
+            pickle.dump(ECR_list_of_single_feature, fout)
 
     # initialize the optimal feature set with feature of highest ECR
-    max_total_ECR = max(ECR_list_of_single_feature)
-    optimal_feature_set.append(feature_space[ECR_list_of_single_feature.index(max_total_ECR)])
+    #max_total_ECR = max(ECR_list_of_single_feature)
+    ECR_list_of_single_feature = sorted(ECR_list_of_single_feature, key=lambda x: x[1], reverse=True) # sort feature by ECR
+    ECR_dict_of_single_feature = dict(ECR_list_of_single_feature)
+    feature_space = map(lambda x: x[0], ECR_list_of_single_feature) # update feature space by ECR order
+    optimal_feature_set.extend(map(lambda x: x[0], ECR_list_of_single_feature[:2])) # select top 7 ECR features
     print(optimal_feature_set)
 
     # feature selection iterations
-    correlation_rank_reverse = False
-    iter_count = 10
-    while (len(optimal_feature_set) < MAX_NUM_OF_FEATURES and iter_count>0):
-        iter_count -= 1
-        print "####### Search next feature on iteration: "+str(len(optimal_feature_set))+" #######"
-        remain_feature_space = list(set(feature_space) - set(optimal_feature_set)) # features not in optimal feature set
+    rank_reverse = False
+    # iter_count = 10
+    while (len(optimal_feature_set) < MAX_NUM_OF_FEATURES):
+        # iter_count -= 1
+        print "********* Search next feature on level <"+str(len(optimal_feature_set))+"> *********"
+        #remain_feature_space = list(set(feature_space) - set(optimal_feature_set)) # features not in optimal feature set
+        remain_feature_space = list([ft for ft in feature_space if ft not in optimal_feature_set])# features not in optimal feature set
         # feature selection heuristics
-        print "* Compute correlation between optimal feature set and candidate feature ..."
-        corr_list = list() # correlation between new feature and optimal feature set
-        bar = pgb.ProgressBar()
-        for ft in bar(remain_feature_space):
-            corr_list.append([ft, compute_correlation(all_data_discretized, optimal_feature_set, ft)])
+        print ">>> Select candidate feature set ..."
+        # corr_list = list() # correlation between new feature and optimal feature set
+        # bar = pgb.ProgressBar()
+        # for ft in bar(remain_feature_space):
+        #     corr_list.append([ft, compute_correlation(all_data_discretized, optimal_feature_set, ft)])
         topK = 5+int(0.03*np.exp(len(optimal_feature_set))) # dynamically choose top-K candidate features based on feature similarity metrics
-        top_features = map(lambda x: x[0], sorted(corr_list, key=lambda x: x[1], reverse=correlation_rank_reverse)[:topK])
+        #top_features = map(lambda x: x[0], sorted(corr_list, key=lambda x: x[1], reverse=correlation_rank_reverse)[:topK])
+        # ECR_rank = map(lambda ft: [ft, ECR_dict_of_single_feature[ft]], remain_feature_space)
+        # top_features = map(lambda x: x[0], sorted(ECR_rank, key=lambda x: x[1], reverse=rank_reverse)[:topK])
+        top_features = list()
+        count_features = 0
+        top_features = remain_feature_space[:topK]
         # select optimal feature from candidate set based on ECR value
         ECR_list = list() # ECR values of optimal feature set with new candidate feature
         for ft in top_features:
             selected_feature = list(optimal_feature_set)
             selected_feature.append(ft) # combine candidate feature to optimal feature set
             ECR_with_ft_added = compute_ECR(all_data_discretized, selected_feature)
-            print "Candidate feature: "+ ft +" --> ECR value:"+ str(ECR_with_ft_added)
+            print "* Candidate feature: "+ ft +" --> ECR value:"+ str(ECR_with_ft_added)
             if (ECR_with_ft_added > max_total_ECR):
-                print "Qualified candidate feature added +"
+                print "\tQualified candidate feature added +"
                 ECR_list.append([ft, ECR_with_ft_added])
             else:
-                print "Unqualified candidate feature skipped -"
+                print "\tUnqualified candidate feature skipped ~"
         if (not ECR_list): # if no new qualified candidate feature, keep searching
-            correlation_rank_reverse = not correlation_rank_reverse
+            #rank_reverse = not rank_reverse
             continue
         else:
             best_next_feature, bestECR = sorted(ECR_list, key=lambda x: x[1], reverse=True)[0]
@@ -235,21 +255,38 @@ if __name__ == "__main__":
             max_total_ECR = bestECR
         # check potential for improving ECR over all subsets of optimal feature set
         size_of_optimal_feature_set = len(optimal_feature_set)
-        if (size_of_optimal_feature_set >= MAX_NUM_OF_FEATURES):
+        if (size_of_optimal_feature_set > 1): #MAX_NUM_OF_FEATURES
             is_subset_better = True
-            while (size_of_optimal_feature_set>1 and is_subset_better):
-                ECR_list = map(lambda ft_index: compute_ECR(all_data_discretized,
-                                optimal_feature_set[:ft_index]+optimal_feature_set[ft_index+1:]),
-                                range(size_of_optimal_feature_set-1)) # calculate ECR for optimal feature subsets
+            ft_subset = list(optimal_feature_set)
+            subset_size = size_of_optimal_feature_set
+            print ">>> test subset ECR ... "
+            while (subset_size>1 and is_subset_better):
+                # print subset_size
+                # print ft_subset
+                choices = range(subset_size-1)
+                ECR_list = map(lambda f_id: compute_ECR(all_data_discretized, ft_subset[:f_id]+ft_subset[f_id+1:]), choices)
+                # print "** compute ECR of all subset ..."
+                # ECR_list = list()
+                # bar = pgb.ProgressBar()
+                # for fid in bar(choices):
+                #     selected_feature = ft_subset[:fid]+ft_subset[fid+1:]
+                #     ECR_val = compute_ECR(all_data_discretized, selected_feature)
+                #     print "ECR val = ", ECR_val
+                #     ECR_list.append(ECR_val)
+                #ECR_list = map(lambda ft_index: compute_ECR(all_data_discretized, optimal_feature_set[:ft_index]+optimal_feature_set[ft_index+1:]), range(size_of_optimal_feature_set-1)) # calculate ECR for optimal feature subsets
                 max_ECR_in_subset = max(ECR_list)
                 if (max_ECR_in_subset >= max_total_ECR): # choose subset with ECR no less than highest overall ECR
-                    print "Better optimal feature subset is discovered!"
+                    print "!!!Better optimal feature subset is discovered!!!"
                     ft_index_of_max_subset_ECR = ECR_list.index(max_ECR_in_subset)
-                    optimal_feature_set = optimal_feature_set.pop(ft_index_of_max_subset_ECR)
+                    ft_removed = ft_subset.pop(ft_index_of_max_subset_ECR)
                     max_total_ECR = max_ECR_in_subset
-                    size_of_optimal_feature_set = len(optimal_feature_set)
+                    subset_size = len(ft_subset)
+                    # print "ft_subset is ", ft_subset
+                    print "\tRemove feature "+str(ft_removed) 
+                    #is_subset_better = False
                 else:
                     is_subset_better = False
+            optimal_feature_set = list(ft_subset)
         # keep record of the highest ECR and its optimal feature set so far
         print "Highest ECR so far: "+str(max_total_ECR)+" with optimal feature set as:"
         print optimal_feature_set
