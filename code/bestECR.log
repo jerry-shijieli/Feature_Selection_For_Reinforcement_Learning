@@ -1,0 +1,15 @@
+* Highest ECR so far: 110.148747053
+* Optimal feature set: CurrPro_avgProbTimeDeviationWE, difficultProblemCountSolved, ruleScoreIMPL, PrepCount, CurrPro_avgProbTime, RuleTypesCount, SolvedPSInLevel, ruleScoreSIMP
+* Selection heuristic rule: Random walk with binary discretization
+* Time cost in feature selection: 2444.94167495
+
+* Highest ECR so far: 76.6696624979
+* Optimal feature set: probIndexinLevel, difficultProblemCountSolved, CurrPro_avgProbTimeDeviationWE, cumul_symbolicRepresentationCount, CurrPro_NumProbRule, cumul_F1Score, cumul_PreviousStepClickCountWE, cumul_deletedApp
+* Selection heuristic rule: Random walk with binary discretization
+* Time cost in feature selection: 1801.63090682
+
+* Highest ECR so far: 164.915984665
+* Optimal feature set: probIndexinLevel, difficultProblemCountSolved, CurrPro_avgProbTimeWE, Level, PrepCount, cumul_AppRatio, cumul_RightApp, cumul_PreviousStepClickCountWE
+* Selection heuristic rule: Random walk with binary discretization
+* Time cost in feature selection: 2498.40841484
+
