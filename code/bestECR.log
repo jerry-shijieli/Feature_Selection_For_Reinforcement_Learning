@@ -13,3 +13,18 @@
 * Selection heuristic rule: Random walk with binary discretization
 * Time cost in feature selection: 2498.40841484
 
+* Highest ECR so far: 96.6967308727
+* Optimal feature set: probIndexinLevel, cumul_easyProblemCountSolved, ruleScoreCONJ, CurrPro_avgProbTimeWE, cumul_RrightAppRatio, cumul_DirectProofActionCount, ruleScoreCONTRA, cumul_OptionalCount
+* Selection heuristic rule: Random walk with binary discretization
+* Time cost in feature selection: 3306.27169394
+
+* Highest ECR so far: 225.392195537
+* Optimal feature set: probIndexinLevel, CurrPro_avgProbTimeWE, difficultProblemCountSolved, cumul_RrightAppRatio, UseCount, cumul_TotalTime, cumul_WrongApp, ruleScoreHS
+* Selection heuristic rule: Random walk with binary discretization
+* Time cost in feature selection: 2619.79096293
+
+* Highest ECR so far: 227.561636357
+* Optimal feature set: probIndexinLevel, difficultProblemCountSolved, CurrPro_avgProbTimeWE, cumul_RrightAppRatio, UseCount, ruleScoreIMPL, cumul_WrongSyntaxApp, ruleScoreHS
+* Selection heuristic rule: Random walk with binary discretization
+* Time cost in feature selection: 6450.24345803
+

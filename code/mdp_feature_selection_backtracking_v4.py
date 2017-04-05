@@ -242,8 +242,9 @@ if __name__ == "__main__":
         print ">>> Select candidate feature set ..."
         topK = 30+int(0.02*np.exp(len(optimal_feature_set))) # dynamically choose top-K candidate features based on feature similarity metrics
         count_features = 0
-        rnd.shuffle(remain_feature_space)
-        top_features = remain_feature_space[:topK]
+        #rnd.shuffle(remain_feature_space)
+        #top_features = remain_feature_space[:topK]
+        top_features = remain_feature_space
         # select optimal feature from candidate set based on ECR value
         ECR_list = list() # ECR values of optimal feature set with new candidate feature
         for ft in top_features:
@@ -292,7 +293,7 @@ if __name__ == "__main__":
     save_info = dict() # feature selection info to save 
     save_info["* Highest ECR so far: "] = str(max_total_ECR)
     save_info["* Optimal feature set: "] = ', '.join(optimal_feature_set)
-    save_info["* Time cost in feature selection: "] = str(time_cost)
-    save_info["* Selection heuristic rule: "] = "Random walk with binary discretization"
+    save_info["* Time cost in feature selection: "] = str(time_cost)+' seconds'
+    save_info["* Selection heuristic rule: "] = "Random walk with binary discretization and no random"
     save_optimal_feature_selection(all_data_discretized, optimal_feature_set, save_info)
     induce_policy_MDP2(all_data_discretized, optimal_feature_set)
