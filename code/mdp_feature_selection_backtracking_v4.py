@@ -240,11 +240,12 @@ if __name__ == "__main__":
         remain_feature_space = list([ft for ft in feature_space if ft not in optimal_feature_set])# features not in optimal feature set
         # feature selection heuristics
         print ">>> Select candidate feature set ..."
-        topK = 30+int(0.02*np.exp(len(optimal_feature_set))) # dynamically choose top-K candidate features based on feature similarity metrics
+        # topK = 30+int(0.02*np.exp(len(optimal_feature_set))) # dynamically choose top-K candidate features based on feature similarity metrics
+        topK = len(remain_feature_space)/2+int(0.01*np.exp(len(optimal_feature_set))) # dynamically choose top-K candidate features based on feature similarity metrics
         count_features = 0
         #rnd.shuffle(remain_feature_space)
-        #top_features = remain_feature_space[:topK]
-        top_features = remain_feature_space
+        top_features = remain_feature_space[:topK]
+        #top_features = remain_feature_space
         # select optimal feature from candidate set based on ECR value
         ECR_list = list() # ECR values of optimal feature set with new candidate feature
         for ft in top_features:
