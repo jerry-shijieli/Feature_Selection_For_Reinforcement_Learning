@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4a4034cb-507e-4396-8187-184126f28fd5" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/code/mdp_feature_selection_001.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/code/correlation_based_feature_selection_backtracking.ipynb" afterPath="$PROJECT_DIR$/code/correlation_based_feature_selection_backtracking.ipynb" />
-    </list>
+    <list default="true" id="4a4034cb-507e-4396-8187-184126f28fd5" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
