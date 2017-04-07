@@ -196,6 +196,8 @@ if __name__ == "__main__":
     ECR_list_of_single_feature = list()
     optimal_feature_set = list()
     max_total_ECR = 0
+    initial_num_of_features = 1
+    extra_num_of_features = 2
 
     # discretization feature values by median
     all_data_discretized = original_data.loc[:, "student":"reward"]
@@ -225,7 +227,7 @@ if __name__ == "__main__":
     ECR_list_of_single_feature = sorted(ECR_list_of_single_feature, key=lambda x: x[1], reverse=True) # sort feature by ECR
     ECR_dict_of_single_feature = dict(ECR_list_of_single_feature)
     feature_space = map(lambda x: x[0], ECR_list_of_single_feature) # update feature space by ECR order
-    optimal_feature_set.extend(map(lambda x: x[0], ECR_list_of_single_feature[:1])) # select top 7 ECR features
+    optimal_feature_set.extend(map(lambda x: x[0], ECR_list_of_single_feature[:initial_num_of_features])) # select top 7 ECR features
     start_time = time.time() # record start time to measure searching time
     print "* Initial optimal feature selection is "
     print optimal_feature_set
@@ -235,7 +237,7 @@ if __name__ == "__main__":
     # feature selection iterations
     cur_optimal_feature_set = list() # record the 8 optimal features.
     cur_max_total_ECR = 0
-    while (len(optimal_feature_set) < MAX_NUM_OF_FEATURES+1):
+    while (len(optimal_feature_set) < MAX_NUM_OF_FEATURES+extra_num_of_features):
         print "\n********* Search next feature on level <"+str(len(optimal_feature_set))+"> *********"
         #remain_feature_space = list(set(feature_space) - set(optimal_feature_set)) # features not in optimal feature set
         remain_feature_space = list([ft for ft in feature_space if ft not in optimal_feature_set])# features not in optimal feature set
@@ -292,7 +294,7 @@ if __name__ == "__main__":
                 cur_optimal_feature_set = optimal_feature_set
                 cur_max_total_ECR = max_total_ECR
         # keep record of the highest ECR and its optimal feature set so far
-        print "Max ECR touched so far: "+str(max_total_ECR)+" with optimal feature set as:"
+        print "Max ECR touched so far: "+str(max_total_ECR)+" with "+str(len(optimal_feature_set))+" optimal features as:"
         print optimal_feature_set
         print "Highest valid ECR so far: "+str(cur_max_total_ECR)+" with "+str(len(cur_optimal_feature_set))+" optimal features as:"
         print cur_optimal_feature_set
@@ -303,7 +305,7 @@ if __name__ == "__main__":
 
     save_info = dict() # feature selection info to save 
     save_info["* Highest ECR so far: "] = str(max_total_ECR)
-    save_info["* Optimal feature set: "] = ', '.join(optimal_feature_set)
+    save_info["* Optimal feature set:\n["] = ', '.join(optimal_feature_set)+']'
     save_info["* Time cost in feature selection: "] = str(time_cost)+' seconds'
     save_info["* Selection heuristic rule: "] = "Random walk with binary discretization and no random"
     save_optimal_feature_selection(all_data_discretized, optimal_feature_set, save_info)
