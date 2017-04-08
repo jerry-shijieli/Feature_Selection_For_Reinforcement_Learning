@@ -197,7 +197,7 @@ if __name__ == "__main__":
     optimal_feature_set = list()
     max_total_ECR = 0
     initial_num_of_features = 1
-    extra_num_of_features = 2
+    extra_num_of_features = 1
 
     # discretization feature values by median
     all_data_discretized = original_data.loc[:, "student":"reward"]
@@ -232,11 +232,12 @@ if __name__ == "__main__":
     print "* Initial optimal feature selection is "
     print optimal_feature_set
     print "* Initial ECR is "
-    print str(compute_ECR(all_data_discretized, optimal_feature_set))
+    max_total_ECR = compute_ECR(all_data_discretized, optimal_feature_set)
+    print str(max_total_ECR)
 
     # feature selection iterations
-    cur_optimal_feature_set = list() # record the 8 optimal features.
-    cur_max_total_ECR = 0
+    valid_optimal_feature_set = list() # record the 8 optimal features.
+    valid_max_total_ECR = max_total_ECR if (len(optimal_feature_set)<=MAX_NUM_OF_FEATURES) else 0
     while (len(optimal_feature_set) < MAX_NUM_OF_FEATURES+extra_num_of_features):
         print "\n********* Search next feature on level <"+str(len(optimal_feature_set))+"> *********"
         #remain_feature_space = list(set(feature_space) - set(optimal_feature_set)) # features not in optimal feature set
@@ -257,7 +258,7 @@ if __name__ == "__main__":
             selected_feature.append(ft) # combine candidate feature to optimal feature set
             ECR_with_ft_added = compute_ECR(all_data_discretized, selected_feature)
             print "* Candidate feature: "+ ft +" --> ECR value: "+ str(ECR_with_ft_added)
-            if (ECR_with_ft_added > max_total_ECR):
+            if (ECR_with_ft_added >= valid_max_total_ECR):
                 print "\tQualified candidate feature added +"
                 ECR_list.append([ft, ECR_with_ft_added])
             else:
@@ -270,7 +271,7 @@ if __name__ == "__main__":
             best_candidate_ft_set = list()
             bar = pgb.ProgressBar()
             for i in bar(range(len(ECR_list))):
-                if (ECR_list[i][1] > max_total_ECR):
+                if (ECR_list[i][1] >= valid_max_total_ECR):
                     candidate_ft_set = optimal_feature_set+[ECR_list[i][0]]
                     max_total_ECR = ECR_list[i][1]
                     is_subset_better = True
@@ -280,33 +281,36 @@ if __name__ == "__main__":
                         choices = range(subset_size-1)
                         ECR_sublist = map(lambda f_id: compute_ECR(all_data_discretized, best_candidate_ft_set[:f_id]+best_candidate_ft_set[f_id+1:]), choices)
                         max_ECR_in_subset = max(ECR_sublist)
-                        if (max_ECR_in_subset >= max_total_ECR): # choose subset with ECR no less than highest overall ECR
+                        if (max_ECR_in_subset >= valid_max_total_ECR): # choose subset with ECR no less than highest overall ECR
                             print "!!!Better optimal feature subset is discovered!!!"
                             ft_index_of_max_subset_ECR = ECR_sublist.index(max_ECR_in_subset)
                             ft_removed = best_candidate_ft_set.pop(ft_index_of_max_subset_ECR)
                             max_total_ECR = max_ECR_in_subset
                             subset_size = len(best_candidate_ft_set)
+                            if (subset_size <= MAX_NUM_OF_FEATURES):
+                                valid_max_total_ECR = max_total_ECR
+                                valid_optimal_feature_set = list(best_candidate_ft_set)
                             print "\tRemove feature "+str(ft_removed) 
                         else:
                             is_subset_better = False
             optimal_feature_set = list(best_candidate_ft_set)
-            if (len(optimal_feature_set) <= MAX_NUM_OF_FEATURES):
-                cur_optimal_feature_set = optimal_feature_set
-                cur_max_total_ECR = max_total_ECR
+            if (len(optimal_feature_set) <= MAX_NUM_OF_FEATURES) and (max_total_ECR >= valid_max_total_ECR):
+                valid_optimal_feature_set = list(optimal_feature_set)
+                valid_max_total_ECR = max_total_ECR
         # keep record of the highest ECR and its optimal feature set so far
         print "Max ECR touched so far: "+str(max_total_ECR)+" with "+str(len(optimal_feature_set))+" optimal features as:"
         print optimal_feature_set
-        print "Highest valid ECR so far: "+str(cur_max_total_ECR)+" with "+str(len(cur_optimal_feature_set))+" optimal features as:"
-        print cur_optimal_feature_set
+        print "Highest valid ECR so far: "+str(valid_max_total_ECR)+" with "+str(len(valid_optimal_feature_set))+" optimal features as:"
+        print valid_optimal_feature_set
 
-    max_total_ECR = cur_max_total_ECR # retrieve upper limit ECR 
-    optimal_feature_set = cur_optimal_feature_set # retrieve feature set of upper limit ECR
+    max_total_ECR = valid_max_total_ECR # retrieve upper limit ECR 
+    optimal_feature_set = valid_optimal_feature_set # retrieve feature set of upper limit ECR
     time_cost = time.time() - start_time # time cost on feature selection
 
     save_info = dict() # feature selection info to save 
     save_info["* Highest ECR so far: "] = str(max_total_ECR)
     save_info["* Optimal feature set:\n["] = ', '.join(optimal_feature_set)+']'
     save_info["* Time cost in feature selection: "] = str(time_cost)+' seconds'
-    save_info["* Selection heuristic rule: "] = "Random walk with binary discretization and no random"
+    save_info["* Selection heuristic rule: "] = "Random walk with binary discretization and "+str(extra_num_of_features)+" extra features but no random"
     save_optimal_feature_selection(all_data_discretized, optimal_feature_set, save_info)
     induce_policy_MDP2(all_data_discretized, optimal_feature_set)
