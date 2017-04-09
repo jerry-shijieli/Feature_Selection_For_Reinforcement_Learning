@@ -12,6 +12,8 @@ import os
 import sys
 import pickle
 import copy
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 def generate_MDP_input2(original_data, features):
 
@@ -183,6 +185,76 @@ def save_optimal_feature_selection(dataset, optimal_feature_set, save_info):
         print "Failed to save results!!!"
 
 
+def binListString(x,bitLength):
+    outputList=[str(0)]*bitLength
+    binList=[str(int(i)) for i in str(bin(x))[2:]]
+    w=len(binList)
+    for i in range(0,w):
+        outputList[i+bitLength-w]=binList[i]
+    return ':'.join(outputList)
+
+def binFindNum(dis_state,selectList):
+    binList=dis_state.split(":")
+    k=0
+    
+    for i in range(len(selectList)):
+        
+        k=int(binList[selectList[i]])+k*2
+        #print selectList[i],binList[selectList[i]],k
+    return k
+def visual_policy(original_data, selected_features,rowList=[0,1,2,3],colList=[4,5,6,7]):
+
+    [start_states, A, expectR, distinct_acts, distinct_states] = generate_MDP_input2(original_data, selected_features)
+
+    # apply Value Iteration to run the MDP
+    vi = mdptoolbox.mdp.ValueIteration(A, expectR, 0.9)
+    vi.run()
+
+    Ns = len(distinct_states)
+    nrows=len(rowList)
+    ncols=len(colList)
+    image = np.ones((2**nrows,2**ncols))
+   
+    row_labels = []
+    col_labels = []
+    for x in range(2**nrows):
+        row_labels.append(binListString(x,nrows))
+    for x in range(2**ncols):
+        col_labels.append(binListString(x,ncols))
+    countWE=0
+    countPS=0
+    for s in range(Ns):
+        print(distinct_states[s] + " -> " + distinct_acts[vi.policy[s]] + ", " + str(vi.V[s]))
+        
+        rowIndex=binFindNum(distinct_states[s],rowList)
+        colIndex=binFindNum(distinct_states[s],colList)
+        if distinct_acts[vi.policy[s]]=="WE":
+           image[rowIndex,colIndex]=2
+           countWE=countWE+1
+        else:
+           image[rowIndex,colIndex]=0
+           countPS=countPS+1
+    countNoRule= (2**nrows)*(2**ncols)-Ns
+    print "WE cases:",countWE
+    print "PS cases:",countPS
+    print "no rule cases:",countNoRule
+    fig, ax = plt.subplots()
+    i = ax.matshow(image, cmap=cm.gray,interpolation='none')
+    plt.xticks(range(2**ncols), col_labels, rotation='vertical')
+    plt.yticks(range(2**nrows), row_labels)
+   
+    
+    ax.set_xticks(np.arange(-.5, 2**ncols, 1), minor=True);
+    ax.set_yticks(np.arange(-.5, 2**nrows, 1), minor=True);
+
+    
+    ax.grid(which='minor', color='k', linestyle='-', linewidth=1)
+    ax.set_xlabel('Last 4 features f4:f5:f6:f7')
+    ax.set_ylabel('First 4 features f0:f1:f2:f3',rotation='vertical')
+    plt.show()
+
+
+
 
 if __name__ == "__main__":
     pd.options.mode.chained_assignment = None  # disable unnecessary warning. default='warn'
@@ -197,7 +269,7 @@ if __name__ == "__main__":
     feature_space = feature_data.columns.tolist()
     print feature_space
     # initialize parameters and data structures for correlation-based feature selection algorithm
-    MAX_NUM_OF_FEATURES = 8
+    MAX_NUM_OF_FEATURES = 2
     ECR_list_of_single_feature = list()
     optimal_feature_set = list()
     max_total_ECR = 0
@@ -208,23 +280,8 @@ if __name__ == "__main__":
     bar = pgb.ProgressBar()
     for ft in bar(feature_space):
         ft_data = original_data.loc[:, ft]
-        all_data_discretized[ft] = feature_discretization_by_median(ft_data)
-    dropList=['probIndexinLevel',"difficultProblemCountSolved","CurrPro_avgProbTimeWE","cumul_AppRatio","cumul_MorphCount","CurrPro_avgProbTimeDeviationPS","cumul_FDActionCount","ruleScoreEQUIV",'cumul_TotalWETime']
+        all_data_discretized[ft] = feature_discretization_by_median(ft_data)  
+    optimal_feature_set=["difficultProblemCountSolved",'cumul_symbolicRepresentationCount',"cumul_AppRatio","cumul_MorphCount","CurrPro_avgProbTimeDeviationPS","cumul_FDActionCount","ruleScoreEQUIV",'cumul_TotalWETime']
     del original_data
     
-    cur_optimal_feature_set = list() # record the 8 optimal features.
-    cur_max_total_ECR = 0
-    ECR_list = list() 
-    bar = pgb.ProgressBar()
-    for ft in bar(dropList):
-        subList=copy.deepcopy(dropList)
-        subList.remove(ft) 
-        ECR_with_ft_removed = compute_ECR(all_data_discretized, subList)
-        ECR_list.append([subList, ECR_with_ft_removed])
-        if (len(subList) <= MAX_NUM_OF_FEATURES):
-                cur_optimal_feature_set = subList
-                cur_max_total_ECR = ECR_with_ft_removed
-        print "Highest valid ECR so far: "+str(cur_max_total_ECR)+" with "+str(len(cur_optimal_feature_set))+" optimal features as:"
-        print cur_optimal_feature_set
-    ECR_list = sorted(ECR_list, key=lambda x: x[1], reverse=False)
-    print ECR_list
+    visual_policy(all_data_discretized, optimal_feature_set,rowList=[0,1,2,3],colList=[4,5,6,7])
