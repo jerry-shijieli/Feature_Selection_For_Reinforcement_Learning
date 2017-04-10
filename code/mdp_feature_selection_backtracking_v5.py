@@ -197,7 +197,7 @@ if __name__ == "__main__":
     optimal_feature_set = list()
     max_total_ECR = 0
     initial_num_of_features = 1
-    extra_num_of_features = 1
+    extra_num_of_features = 2
 
     # discretization feature values by median
     all_data_discretized = original_data.loc[:, "student":"reward"]
@@ -281,7 +281,7 @@ if __name__ == "__main__":
                         choices = range(subset_size-1)
                         ECR_sublist = map(lambda f_id: compute_ECR(all_data_discretized, best_candidate_ft_set[:f_id]+best_candidate_ft_set[f_id+1:]), choices)
                         max_ECR_in_subset = max(ECR_sublist)
-                        if (max_ECR_in_subset >= valid_max_total_ECR): # choose subset with ECR no less than highest overall ECR
+                        if (subset_size-1<=MAX_NUM_OF_FEATURES and max_ECR_in_subset >= valid_max_total_ECR): # choose subset with ECR no less than highest overall ECR
                             print "!!!Better optimal feature subset is discovered!!!"
                             ft_index_of_max_subset_ECR = ECR_sublist.index(max_ECR_in_subset)
                             ft_removed = best_candidate_ft_set.pop(ft_index_of_max_subset_ECR)
@@ -290,6 +290,13 @@ if __name__ == "__main__":
                             if (subset_size <= MAX_NUM_OF_FEATURES):
                                 valid_max_total_ECR = max_total_ECR
                                 valid_optimal_feature_set = list(best_candidate_ft_set)
+                            print "\tRemove feature "+str(ft_removed) 
+                        elif (subset_size>MAX_NUM_OF_FEATURES+1 and max_ECR_in_subset >= max_total_ECR):
+                            print "!!!Better optimal feature subset is discovered!!!"
+                            ft_index_of_max_subset_ECR = ECR_sublist.index(max_ECR_in_subset)
+                            ft_removed = best_candidate_ft_set.pop(ft_index_of_max_subset_ECR)
+                            max_total_ECR = max_ECR_in_subset
+                            subset_size = len(best_candidate_ft_set)
                             print "\tRemove feature "+str(ft_removed) 
                         else:
                             is_subset_better = False
