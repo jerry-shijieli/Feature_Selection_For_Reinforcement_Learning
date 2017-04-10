@@ -238,7 +238,12 @@ if __name__ == "__main__":
     # feature selection iterations
     valid_optimal_feature_set = list() # record the 8 optimal features.
     valid_max_total_ECR = max_total_ECR if (len(optimal_feature_set)<=MAX_NUM_OF_FEATURES) else 0
+    prev_optimal_feature_set = list()
     while (len(optimal_feature_set) < MAX_NUM_OF_FEATURES+extra_num_of_features):
+        if (set(prev_optimal_feature_set) == set(optimal_feature_set)):
+            break # if no change in optimal set, then end searching loop
+        else:
+            prev_optimal_feature_set = list(optimal_feature_set)
         print "\n********* Search next feature on level <"+str(len(optimal_feature_set))+"> *********"
         #remain_feature_space = list(set(feature_space) - set(optimal_feature_set)) # features not in optimal feature set
         remain_feature_space = list([ft for ft in feature_space if ft not in optimal_feature_set])# features not in optimal feature set
