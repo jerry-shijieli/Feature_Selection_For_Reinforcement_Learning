@@ -238,6 +238,7 @@ def visual_policy(original_data, selected_features,rowList=[0,1,2,3],colList=[4,
     print "WE cases:",countWE
     print "PS cases:",countPS
     print "no rule cases:",countNoRule
+    print "ECR:", calcuate_ECR(start_states, vi.V)
     fig, ax = plt.subplots()
     i = ax.matshow(image, cmap=cm.gray,interpolation='none')
     plt.xticks(range(2**ncols), col_labels, rotation='vertical')
@@ -251,7 +252,8 @@ def visual_policy(original_data, selected_features,rowList=[0,1,2,3],colList=[4,
     ax.grid(which='minor', color='k', linestyle='-', linewidth=1)
     ax.set_xlabel('Last 4 features f4:f5:f6:f7')
     ax.set_ylabel('First 4 features f0:f1:f2:f3',rotation='vertical')
-    plt.show()
+    #plt.show()
+    fig.savefig('policy_visualization.png')
 
 
 
