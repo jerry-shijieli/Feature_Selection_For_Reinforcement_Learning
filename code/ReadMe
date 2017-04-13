@@ -1,0 +1,27 @@
+All codes are in code/ folder.
+
+Our feature discretization and selection codes are in the file named: 
+    mdp_feature_selection_greedy_forward_backward.py
+
+To run this code, type command in terminal as:
+    $python mdp_feature_selection_greedy_forward_backward.py
+
+The code will read input file MDP_Original_data2.csv, compute ECR to select best feature set and print out best policy.
+
+Since this code may takes a long time (about 3 hours), we rewrite this code into a python notebook:
+    mdp_feature_selection_greedy_forward_backward.ipynb
+and executed this notebook. So all the intermediate and final results have been recorded in this notebook, you can view it through web browser. To open this notebook in web browser, type command in terminal as:
+    $ipython notebook
+This notebook depends on the given code for ECR and policy computation: 
+    MDP_function.py
+
+The required python packages are as follows:
+    numpy
+    pandas
+    matplotlib
+    scipy
+    progressbar
+
+Also we modified the code in mdp.py as described in Piazza post. Please replace original mdp.py by our code before running other code files.
+
+Please feel free to contact us if you have any question concerning this project!
