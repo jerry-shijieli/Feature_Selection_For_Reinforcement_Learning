@@ -21,7 +21,7 @@ matplotlib
 seaborn
 progressbar
 ```
-* Note _nltk v3.2_ may have issue with stemming functions.
+* Modification on pymdptoolbox installed module codes is needed to make it work in this project. See the following instructions.
 
 ## Running the tests
 
@@ -60,9 +60,11 @@ Please feel free to contact us if you have any question concerning this project!
 
 ## Expected Results
 
-The result is to improve the overall ECR using selected features and generate cooresponding policies in the state space (represented by binary feature value combination). Our best result achieved overall ECR above 350 with a policy coverage around 89%, which are both significant improvement over the original work. And we also prove that the feature-correlation-based feature selection method does not work well by the plot of correlation matrix between single action reward and optimal features.
+The result is to improve the overall ECR using selected features and generate cooresponding policies in the state space (represented by binary feature value combination). Our best result achieved overall ECR above 350 with a policy coverage around 89%, which are both significant improvement over the original work. 
 
 ![Policy Visualization](https://github.com/jerry-shijieli/CSC591_AssignedProject_Feature_Selection_For_Reinforcement_Learning/blob/master/image/policy_visualization.png)
+
+In addition, we also prove that the feature-correlation-based feature selection method does not work well by the plot of correlation matrix between single action reward and optimal features.
 
 ![Optimal feature correlation matrix with reward included](https://github.com/jerry-shijieli/CSC591_AssignedProject_Feature_Selection_For_Reinforcement_Learning/blob/master/image/correlation_of_optimal_feature_vs_reward.png)
 
