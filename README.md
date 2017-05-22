@@ -1,6 +1,5 @@
 # Feature Selection For Reinforcement Learning In Educational Policy Development
 
-## Introduction
 
 This project aim to develop feature selection method to improve the overall ECR(Expected Cumulative Reward) value in a recently [published work](http://dl.acm.org/citation.cfm?id=2930247), which studied policies to improve students' learning (measured by ECR) using reinforcement learning model. The  reinforcement learning system built a Markov model consisting of tutor actions, learning context (features) as states and student learning as reward. We develop a feature selection model significantly improving the previous work in the publication using a forward-backward greedy algorithm of a wrapper feature selection method.
 
