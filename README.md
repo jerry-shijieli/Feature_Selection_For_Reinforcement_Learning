@@ -67,15 +67,15 @@ In addition, we also prove that the feature-correlation-based feature selection 
 
 ![Optimal feature correlation matrix with reward included](https://github.com/jerry-shijieli/CSC591_AssignedProject_Feature_Selection_For_Reinforcement_Learning/blob/master/image/correlation_of_optimal_feature_vs_reward.png)
 
-<!--- ## Contributors
+## Team Members
 
 * **Shijie Li**  *(email: sli41@ncsu.edu)* 
 * **Cong Mai** *(email: cmai@ncsu.edu)*
-* **Yifan Guo** *(email: yguo14@ncsu.edu)* -->
+* **Yifan Guo** *(email: yguo14@ncsu.edu)* 
 
 ## Acknowledgments
 
 * Thank Prof. Min Chi for the support on this project.
-* Thank all TAs of CSC591 course for the evaluation and feedback on this project.
+* Thank all feedbacks and suggestions on this project.
 
 
